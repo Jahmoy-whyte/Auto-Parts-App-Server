@@ -1,13 +1,13 @@
-import express, { Router } from "express";
-import { dbGetMakeInfo, dbGetMake } from "../model/makeTable.js";
+import { Router } from "express";
+import { dbGetSubCategory } from "../model/categoriesTable.js";
 
 const Route = Router();
 
 Route.get("/", async (req, res, next) => {
   try {
-    const data = await dbGetMake();
+    const data = await dbGetSubCategory();
     res.status(200).json({ res: data, status: "ok" });
-    console.log("Get make");
+    console.log("Get subcategory");
   } catch (error) {
     next(error.message);
   }
