@@ -4,6 +4,7 @@ import makeRoute from "./server/routes/makeRoute.js";
 import modelRoute from "./server/routes/modelRoute.js";
 import yearRoute from "./server/routes/yearRoute.js";
 import categoriesRoute from "./server/routes/categoriesRoute.js";
+import usersRoute from "./server/routes/usersRoute.js";
 import cors from "cors";
 
 const app = express();
@@ -16,6 +17,7 @@ app.use("/make", makeRoute);
 app.use("/model", modelRoute);
 app.use("/year", yearRoute);
 app.use("/categories", categoriesRoute);
+app.use("/users", usersRoute);
 
 app.get("/", (req, res) => {
   res.send("server is up");

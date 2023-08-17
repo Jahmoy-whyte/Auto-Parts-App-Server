@@ -3,6 +3,7 @@ import {
   dbGetNewArrival,
   dbSearchForProductWithCategory,
   dbSearchForProducts,
+  dbGetProductById,
 } from "../model/productsTable.js";
 
 const Route = Router();
@@ -46,4 +47,16 @@ Route.get(
     }
   }
 );
+
+Route.get("/:productId", async (req, res, next) => {
+  try {
+    const { productId } = req.params;
+    const data = await dbGetProductById(productId);
+    res.status(200).json({ res: data, status: "ok" });
+    console.log("product by id");
+  } catch (error) {
+    next(error.message);
+  }
+});
+
 export default Route;
