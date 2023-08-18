@@ -7,18 +7,18 @@ export const dbUserExist = async (email) => {
   return result.length > 0 ? true : false;
 };
 
-export const dbCreateUser = async (email, hashedpassword) => {
+export const dbCreateUser = async (userId, email, hashedpassword) => {
   const [result] = await pool.execute(
-    `INSERT INTO users (email ,password) VALUES(?,?)
+    `INSERT INTO users (user_id , email ,password) VALUES(?,?,?)
     `,
-    [email, hashedpassword]
+    [userId, email, hashedpassword]
   );
 };
 
 export const dbGetUser = async (email) => {
   const [result] = await pool.execute(
     `SELECT 
-    user_id as id
+    user_id as id,
     email,
     password,
     firstname,

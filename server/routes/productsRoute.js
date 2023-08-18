@@ -14,7 +14,7 @@ Route.get("/", async (req, res, next) => {
     res.status(200).json({ res: data, status: "ok" });
     console.log("product");
   } catch (error) {
-    next(error.message);
+    next(error);
   }
 });
 
@@ -25,7 +25,7 @@ Route.get("/:makeId/:modelId/:yearId", async (req, res, next) => {
     res.status(200).json({ res: data, status: "ok" });
     console.log("product make year model");
   } catch (error) {
-    next(error.message);
+    next(error);
   }
 });
 
@@ -43,7 +43,7 @@ Route.get(
       res.status(200).json({ res: data, status: "ok" });
       console.log("product make, model, year, subCategory");
     } catch (error) {
-      next(error.message);
+      next(error);
     }
   }
 );
@@ -55,7 +55,7 @@ Route.get("/:productId", async (req, res, next) => {
     res.status(200).json({ res: data, status: "ok" });
     console.log("product by id");
   } catch (error) {
-    next(error.message);
+    next(error);
   }
 });
 

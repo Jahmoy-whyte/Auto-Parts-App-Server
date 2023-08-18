@@ -9,7 +9,7 @@ Route.get("/", async (req, res, next) => {
     res.status(200).json({ res: data, status: "ok" });
     console.log("Get make");
   } catch (error) {
-    next(error.message);
+    next(error);
   }
 });
 

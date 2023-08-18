@@ -1,13 +1,13 @@
 import { Router } from "express";
-import { dbGetSubCategory } from "../model/categoriesTable.js";
-
+import { dbGetUserCart } from "../model/cartTable.js";
 const Route = Router();
 
 Route.get("/", async (req, res, next) => {
   try {
-    const data = await dbGetSubCategory();
+    const { userId } = req.user;
+    const data = await dbGetUserCart(userId);
     res.status(200).json({ res: data, status: "ok" });
-    console.log("Get subcategory");
+    console.log("Get user cart");
   } catch (error) {
     next(error);
   }

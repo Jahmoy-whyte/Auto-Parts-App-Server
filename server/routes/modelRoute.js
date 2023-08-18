@@ -10,7 +10,7 @@ Route.get("/:makeId", async (req, res, next) => {
     res.status(200).json({ res: data, status: "ok" });
     console.log("Get model bsed on make id");
   } catch (error) {
-    next(error.message);
+    next(error);
   }
 });
 

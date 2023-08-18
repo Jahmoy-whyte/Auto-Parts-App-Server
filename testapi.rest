@@ -2,7 +2,7 @@ POST  http://localhost:3000/users/signup
 content-type: application/json
 
 {
-    "email": "email@email.com",
+    "email": "email@email.com1",
     "password": "hi"
 }
 
@@ -12,6 +12,20 @@ POST  http://localhost:3000/users/login
 content-type: application/json
 
 {
-    "email": "email@email.com",
+    "email": "email@email.com1",
     "password": "hi"
 }
+
+
+###
+
+GET  http://localhost:3000/products
+content-type: application/json
+Authorization:  Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIzMDBmYTRmLWM3M2EtNDg3OS05OTUyLTc4NTMzZjA3MTU2ZSIsImVtYWlsIjoiZW1haWxAZW1haWwuY29tMSIsImZpcnN0bmFtZSI6IiIsImxhc3RuYW1lIjoiIiwicGhvbmUiOiIiLCJpYXQiOjE2OTIyODM1NTB9.gRULXgOmPAaEAzkHBN4IO4Q3kj79J9niJw48bnVJ53s
+
+{
+    "email": "email@email.com1",
+    "password": "hi"
+}
+
+
