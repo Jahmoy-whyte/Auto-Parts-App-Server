@@ -6,10 +6,10 @@ import yearRoute from "./server/routes/yearRoute.js";
 import categoriesRoute from "./server/routes/categoriesRoute.js";
 import usersRoute from "./server/routes/usersRoute.js";
 import cors from "cors";
-import verifyJwtToken from "./server/helper/verifyJwtToken.js";
-
+import verifyJwtToken from "./server/middleware/verifyJwtToken.js";
 import globalErrorHandler from "./server/helper/globalErrorHandler.js";
 import cartRoute from "./server/routes/cartRoute.js";
+import refreshTokenRoute from "./server/routes/refreshTokenRoute.js";
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -22,6 +22,7 @@ app.use("/year", yearRoute);
 app.use("/categories", categoriesRoute);
 app.use("/users", usersRoute);
 app.use("/cart", verifyJwtToken, cartRoute);
+app.use("/refreshtoken", refreshTokenRoute);
 
 app.get("/", (req, res) => {
   res.send("server is up");

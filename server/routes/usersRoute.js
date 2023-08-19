@@ -5,11 +5,11 @@ import { randomUUID } from "crypto";
 import Jwt from "jsonwebtoken";
 import "dotenv/config";
 import CustomError from "../helper/CustomError.js";
-import verifyJwtToken from "../helper/verifyJwtToken.js";
+import { dbSaveRefreshToken } from "../model/refreshTokenTable.js";
 const Route = Router();
 
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
-const EMAIL_TOKEN_SECRET = process.env.EMAIL_TOKEN_SECRET;
+const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
 
 Route.post("/signup", async (req, res, next) => {
   try {
@@ -21,7 +21,7 @@ Route.post("/signup", async (req, res, next) => {
 
     const hashedpassword = await hashPassword(password);
     const userId = randomUUID();
-    await dbCreateUser(userId, email, hashedpassword);
+    await dbCreateUser(userId, email, hashedpassword, false);
 
     res.status(200).json({ res: "Account created successfully", status: "ok" });
   } catch (error) {
@@ -36,16 +36,55 @@ Route.post("/login", async (req, res, next) => {
     // check if user exist
     const userInfo = await dbGetUser(email);
     if (!userInfo.length) throw new CustomError(404, "User doesnt exist");
-    // compare password
+
+    // compare password with hashed password
     const user = userInfo[0];
     const bool = await comparePassword(password, user.password);
     if (!bool) throw new CustomError(401, "Password is incorrect");
 
+    // delete password from object
     delete user.password;
+    // sign access token
+    const accessToken = Jwt.sign(user, ACCESS_TOKEN_SECRET, {
+      expiresIn: "15s",
+    });
 
+    // sign refresh token
+    const refreshToken = Jwt.sign(user, REFRESH_TOKEN_SECRET);
+    // save refresh token to table
+    await dbSaveRefreshToken(user.id, refreshToken);
+
+    res.status(200).json({
+      res: {
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+      },
+      status: "ok",
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+Route.post("/signup/anonymous", async (req, res, next) => {
+  try {
+    const password = randomUUID();
+    const hashedpassword = await hashPassword(password);
+    const userId = randomUUID();
+    await dbCreateUser(userId, "anonymous@email.com", hashedpassword, true);
+    const user = { id: userId };
     const accessToken = Jwt.sign(user, ACCESS_TOKEN_SECRET);
+    const refreshToken = Jwt.sign(user, REFRESH_TOKEN_SECRET);
 
-    res.status(200).json({ res: accessToken, status: "ok" });
+    await dbSaveRefreshToken(user.id, refreshToken);
+
+    res.status(200).json({
+      res: {
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+      },
+      status: "ok",
+    });
   } catch (error) {
     next(error);
   }

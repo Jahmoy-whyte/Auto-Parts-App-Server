@@ -6,7 +6,7 @@ content-type: application/json
     "password": "hi"
 }
 
-###
+### login
 
 POST  http://localhost:3000/users/login
 content-type: application/json
@@ -17,15 +17,26 @@ content-type: application/json
 }
 
 
-###
+### products
 
 GET  http://localhost:3000/products
 content-type: application/json
-Authorization:  Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIzMDBmYTRmLWM3M2EtNDg3OS05OTUyLTc4NTMzZjA3MTU2ZSIsImVtYWlsIjoiZW1haWxAZW1haWwuY29tMSIsImZpcnN0bmFtZSI6IiIsImxhc3RuYW1lIjoiIiwicGhvbmUiOiIiLCJpYXQiOjE2OTIyODM1NTB9.gRULXgOmPAaEAzkHBN4IO4Q3kj79J9niJw48bnVJ53s
+Authorization:  Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIzMDBmYTRmLWM3M2EtNDg3OS05OTUyLTc4NTMzZjA3MTU2ZSIsImVtYWlsIjoiZW1haWxAZW1haWwuY29tMSIsImZpcnN0bmFtZSI6IiIsImxhc3RuYW1lIjoiIiwicGhvbmUiOiIiLCJpYXQiOjE2OTIzNzg3NTAsImV4cCI6MTY5MjM3ODc2NX0.BJUnNO4sPcrc8BmWOdNc3vGSgloIUDA6OONE7uN1880   
 
 {
     "email": "email@email.com1",
     "password": "hi"
 }
+
+###  refreshtoken
+
+POST  http://localhost:3000/refreshtoken
+content-type: application/json
+
+{
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIzMDBmYTRmLWM3M2EtNDg3OS05OTUyLTc4NTMzZjA3MTU2ZSIsImVtYWlsIjoiZW1haWxAZW1haWwuY29tMSIsImZpcnN0bmFtZSI6IiIsImxhc3RuYW1lIjoiIiwicGhvbmUiOiIiLCJpYXQiOjE2OTIzNzg0Mzd9.Gq2KddHai8Gt1L7V-egg5TwcETRuF4K1sg-3Scy8pag"
+}
+
+
 
 

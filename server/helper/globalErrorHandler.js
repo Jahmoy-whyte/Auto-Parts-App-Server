@@ -1,7 +1,7 @@
 const globalErrorHandler = (error, req, res, next) => {
   if (error.statusCode) {
-    console.log("============================ this error");
-    console.log(error);
+    //console.log("============================ this error");
+    //console.log(error);
     res
       .status(error.statusCode)
       .json({ message: error.message, status: "nok" });
