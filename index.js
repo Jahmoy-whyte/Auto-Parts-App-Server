@@ -10,19 +10,25 @@ import verifyJwtToken from "./server/middleware/verifyJwtToken.js";
 import globalErrorHandler from "./server/helper/globalErrorHandler.js";
 import cartRoute from "./server/routes/cartRoute.js";
 import refreshTokenRoute from "./server/routes/refreshTokenRoute.js";
+import isPermitted from "./server/middleware/isPermitted.js";
+
 const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
-app.use("/products", verifyJwtToken, productsRoute);
+
+app.use("/users", usersRoute);
+app.use("/refreshtoken", refreshTokenRoute);
+
+app.use(verifyJwtToken);
+app.use(isPermitted);
+app.use("/products", productsRoute);
 app.use("/make", makeRoute);
 app.use("/model", modelRoute);
 app.use("/year", yearRoute);
 app.use("/categories", categoriesRoute);
-app.use("/users", usersRoute);
-app.use("/cart", verifyJwtToken, cartRoute);
-app.use("/refreshtoken", refreshTokenRoute);
+app.use("/cart", cartRoute);
 
 app.get("/", (req, res) => {
   res.send("server is up");

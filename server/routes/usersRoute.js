@@ -1,11 +1,20 @@
 import { Router } from "express";
-import { dbCreateUser, dbUserExist, dbGetUser } from "../model/usersTable.js";
+import {
+  dbCreateUser,
+  dbUserExist,
+  dbGetUser,
+  dbLoggedInUserInfo,
+} from "../model/usersTable.js";
 import bcrypt from "bcrypt";
 import { randomUUID } from "crypto";
 import Jwt from "jsonwebtoken";
 import "dotenv/config";
 import CustomError from "../helper/CustomError.js";
 import { dbSaveRefreshToken } from "../model/refreshTokenTable.js";
+import { ACCESS_EXPIRES } from "../helper/accessTokenExpiresIn.js";
+
+import isPermitted from "../middleware/isPermitted.js";
+import verifyJwtToken from "../middleware/verifyJwtToken.js";
 const Route = Router();
 
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
@@ -21,7 +30,7 @@ Route.post("/signup", async (req, res, next) => {
 
     const hashedpassword = await hashPassword(password);
     const userId = randomUUID();
-    await dbCreateUser(userId, email, hashedpassword, false);
+    await dbCreateUser(userId, email, hashedpassword, "user");
 
     res.status(200).json({ res: "Account created successfully", status: "ok" });
   } catch (error) {
@@ -46,7 +55,7 @@ Route.post("/login", async (req, res, next) => {
     delete user.password;
     // sign access token
     const accessToken = Jwt.sign(user, ACCESS_TOKEN_SECRET, {
-      expiresIn: "15s",
+      expiresIn: ACCESS_EXPIRES,
     });
 
     // sign refresh token
@@ -66,16 +75,19 @@ Route.post("/login", async (req, res, next) => {
   }
 });
 
-Route.post("/signup/anonymous", async (req, res, next) => {
+Route.post("/login/guest", async (req, res, next) => {
   try {
     const password = randomUUID();
-    const hashedpassword = await hashPassword(password);
     const userId = randomUUID();
-    await dbCreateUser(userId, "anonymous@email.com", hashedpassword, true);
-    const user = { id: userId };
-    const accessToken = Jwt.sign(user, ACCESS_TOKEN_SECRET);
+    const hashedpassword = await hashPassword(password);
+    // create users as guest
+    await dbCreateUser(userId, "guest@email.com", hashedpassword, "guest");
+    const user = { id: userId, userStatus: "guest" };
+    const accessToken = Jwt.sign(user, ACCESS_TOKEN_SECRET, {
+      expiresIn: ACCESS_EXPIRES,
+    });
     const refreshToken = Jwt.sign(user, REFRESH_TOKEN_SECRET);
-
+    // Save Refresh Token
     await dbSaveRefreshToken(user.id, refreshToken);
 
     res.status(200).json({
@@ -83,6 +95,23 @@ Route.post("/signup/anonymous", async (req, res, next) => {
         accessToken: accessToken,
         refreshToken: refreshToken,
       },
+      status: "ok",
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+/* 
+=============================================================================================
+=============================== not login or signup related =================================
+=============================================================================================
+*/
+Route.get("/", verifyJwtToken, isPermitted, async (req, res, next) => {
+  try {
+    const { id } = req.user;
+    const userInfo = await dbLoggedInUserInfo(id);
+    res.status(200).json({
+      res: userInfo,
       status: "ok",
     });
   } catch (error) {

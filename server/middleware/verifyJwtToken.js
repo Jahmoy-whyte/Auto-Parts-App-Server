@@ -8,16 +8,19 @@ const verifyJwtToken = async (req, res, next) => {
   try {
     const authHeader = req.headers["authorization"];
 
-    if (!authHeader) throw new CustomError(401, "unauthorized");
+    if (!authHeader) throw new CustomError(401, "unauthorized(V101)");
 
     const token = authHeader.split(" ")[1];
-    console.log(token);
-    if (!token) throw new CustomError(401, "is invalid token");
 
-    const user = Jwt.verify(token, ACCESS_TOKEN_SECRET);
+    if (!token) throw new CustomError(401, "unauthorized(V201)");
 
-    req.user = user;
-    next();
+    Jwt.verify(token, ACCESS_TOKEN_SECRET, (err, user) => {
+      if (err && err.message == "jwt expired")
+        throw new CustomError(401, "jwt expired");
+      if (err) throw new CustomError(401, "unauthorized(V301)");
+      req.user = user;
+      next();
+    });
   } catch (error) {
     next(error);
   }

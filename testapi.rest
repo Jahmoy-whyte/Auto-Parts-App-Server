@@ -21,7 +21,7 @@ content-type: application/json
 
 GET  http://localhost:3000/products
 content-type: application/json
-Authorization:  Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIzMDBmYTRmLWM3M2EtNDg3OS05OTUyLTc4NTMzZjA3MTU2ZSIsImVtYWlsIjoiZW1haWxAZW1haWwuY29tMSIsImZpcnN0bmFtZSI6IiIsImxhc3RuYW1lIjoiIiwicGhvbmUiOiIiLCJpYXQiOjE2OTIzNzg3NTAsImV4cCI6MTY5MjM3ODc2NX0.BJUnNO4sPcrc8BmWOdNc3vGSgloIUDA6OONE7uN1880   
+Authorization:  Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjM1ODlmYTQ5LTkwYjQtNDdkMC04ZTgyLWUwZTViYjczZTkyZSIsInVzZXJTdGF0dXMiOiJndWVzdCIsImlhdCI6MTY5MjQ0NzkyMiwiZXhwIjoxNjkyNDQ3OTM3fQ.Amrqx_1bK3PupHGkEmAxaIV3PQ3RPto54FA-dXd9_F4 
 
 {
     "email": "email@email.com1",
@@ -34,8 +34,16 @@ POST  http://localhost:3000/refreshtoken
 content-type: application/json
 
 {
-    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIzMDBmYTRmLWM3M2EtNDg3OS05OTUyLTc4NTMzZjA3MTU2ZSIsImVtYWlsIjoiZW1haWxAZW1haWwuY29tMSIsImZpcnN0bmFtZSI6IiIsImxhc3RuYW1lIjoiIiwicGhvbmUiOiIiLCJpYXQiOjE2OTIzNzg0Mzd9.Gq2KddHai8Gt1L7V-egg5TwcETRuF4K1sg-3Scy8pag"
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Ijg0M2FlMGQwLWJjZWUtNDcyYy05NGY0LTJkYTBjM2U3YjhmYiIsInVzZXJTdGF0dXMiOiJndWVzdCIsImlhdCI6MTY5MjQ2MDYzNX0.apDkxO44o5A7Nry3TR2lfcwOUsPYSr0XaBjw4wHp2kw"
 }
+
+
+###  guest
+
+POST  http://localhost:3000/users/login/guest
+content-type: application/json
+
+
 
 
 

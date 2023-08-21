@@ -1,4 +1,5 @@
 const globalErrorHandler = (error, req, res, next) => {
+  console.log(error);
   if (error.statusCode) {
     //console.log("============================ this error");
     //console.log(error);
