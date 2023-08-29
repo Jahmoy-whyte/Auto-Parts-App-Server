@@ -44,15 +44,21 @@ export const dbLoggedInUserInfo = async (userId) => {
     user_status AS userStatus,
     emailverified AS emailVerified,
     email,
-    firstname,
-    lastname,
-    phone
-    FROM users WHERE users.user_id=?`,
+    selected_address_id AS selectedAddressId,
+    firstname AS firstName,
+    lastname AS lastName,
+    phone,
+    address.address,
+    address.place_type AS placeType,
+    address_id AS addressId
+    FROM users LEFT JOIN address ON  
+    users.selected_address_id = address.address_id
+    WHERE users.user_id=?`,
     [userId]
   );
   const [result2] = await pool.execute(
     `SELECT 
-    cart_id AS cartId,
+    cart_id AS id,
     product_id	AS productId,
     quantity 
     FROM cart WHERE user_id=?`,
@@ -63,5 +69,52 @@ export const dbLoggedInUserInfo = async (userId) => {
     result1[0].cart = result2;
     return result1[0];
   }
+
   return [];
+};
+
+export const dbUpdateGuestToUser = async (userId, email, hashedpassword) => {
+  const [result] = await pool.execute(
+    `UPDATE users SET user_id=?, email=? ,password=? , user_status=?
+    WHERE user_id =?
+    `,
+    [userId, email, hashedpassword, "user", userId]
+  );
+
+  console.log(result);
+};
+
+export const dbLogoutUser = async (userId) => {
+  const [result] = await pool.execute(
+    `DELETE FROM refresh_token
+    WHERE user_id =?
+    `,
+    [userId]
+  );
+};
+
+export const dbUpdateUser = async (firstName, lastName, phone, userId) => {
+  const [result] = await pool.execute(
+    `UPDATE users SET 
+    
+      firstname =?,
+      lastname=?,
+      phone=?
+    
+    WHERE user_id=?`,
+    [firstName, lastName, phone, userId]
+  );
+
+  return result.affectedRows;
+};
+
+export const dbUpdateSelectedAddress = async (addressId, id) => {
+  const [result] = await pool.execute(
+    `UPDATE users SET 
+     selected_address_id	 =?
+     WHERE user_id=?`,
+    [addressId, id]
+  );
+
+  return result.affectedRows;
 };

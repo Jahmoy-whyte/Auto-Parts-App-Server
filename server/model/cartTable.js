@@ -27,6 +27,18 @@ export const dbAddToCart = async (userId, productId, quantity) => {
      VALUES(?,?,?)`,
     [userId, productId, quantity]
   );
+  return result.insertId;
+};
 
-  dbAddToCart;
+export const dbDeleteCartItem = async (cartId) => {
+  const [result] = await pool.execute(`DELETE FROM cart WHERE cart_id =?`, [
+    cartId,
+  ]);
+};
+
+export const dbUpdateCartItem = async (quantity, cartId) => {
+  const [result] = await pool.execute(
+    `UPDATE cart SET quantity=? WHERE cart_id =?`,
+    [quantity, cartId]
+  );
 };

@@ -1,1 +1,1 @@
-export const ACCESS_EXPIRES = "10m";
+export const ACCESS_EXPIRES = "15s";

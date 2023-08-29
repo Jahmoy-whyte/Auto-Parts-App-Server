@@ -19,7 +19,7 @@ Route.post("/", async (req, res, next) => {
 
     // verify refreshToken
     Jwt.verify(refreshToken, REFRESH_TOKEN_SECRET, (err, user) => {
-      if (err) throw new CustomError(401, "forbidden(R201)");
+      if (err) throw new CustomError(401, "forbidden(R102)");
 
       delete user.iat;
       // if no error create new new access token
