@@ -1,4 +1,4 @@
-import express, { Router } from "express";
+import { Router } from "express";
 import { dbGetMakeInfo, dbGetMake } from "../model/makeTable.js";
 
 const Route = Router();
