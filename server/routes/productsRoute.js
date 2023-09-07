@@ -4,6 +4,7 @@ import {
   dbSearchForProductWithCategory,
   dbSearchForProducts,
   dbGetProductById,
+  dbProuductPagination,
 } from "../model/productsTable.js";
 
 const Route = Router();
@@ -54,6 +55,16 @@ Route.get("/:productId", async (req, res, next) => {
     const data = await dbGetProductById(productId);
     res.status(200).json({ res: data, status: "ok" });
     console.log("product by id");
+  } catch (error) {
+    next(error);
+  }
+});
+
+Route.get("/pagination/:start", async (req, res, next) => {
+  try {
+    const { start } = req.params;
+    const data = await dbProuductPagination(start);
+    res.status(200).json({ res: data, status: "ok" });
   } catch (error) {
     next(error);
   }

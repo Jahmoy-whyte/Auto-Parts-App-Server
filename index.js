@@ -18,7 +18,8 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import socketVerifyJwtToken from "./server/middleware/socketVerifyJwtToken.js";
 import socketIsPermitted from "./server/middleware/socketIsPermitted.js";
-
+import employeeRoute from "./server/routes/employeeRoute.js";
+import cookieParser from "cookie-parser";
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
@@ -39,14 +40,21 @@ io.on("connection", (socket) => {
 
 const port = process.env.PORT || 3000;
 
-app.use(cors());
+const corsConfig = {
+  credentials: true,
+  origin: "http://localhost:5173",
+};
+app.use(cors(corsConfig));
 app.use(express.json());
+app.use(cookieParser());
 
 app.use("/users", usersRoute);
 app.use("/refreshtoken", refreshTokenRoute);
+app.use("/employee", employeeRoute);
+app.use("/orders", ordersRoute);
+//app.use(verifyJwtToken);
+//app.use(isPermitted(USERS_AND_GUESTS));
 
-app.use(verifyJwtToken);
-app.use(isPermitted(USERS_AND_GUESTS));
 app.use("/products", productsRoute);
 app.use("/make", makeRoute);
 app.use("/model", modelRoute);
@@ -54,7 +62,6 @@ app.use("/year", yearRoute);
 app.use("/categories", categoriesRoute);
 app.use("/cart", cartRoute);
 app.use("/address", addressRoute);
-app.use("/orders", ordersRoute);
 
 app.get("/", (req, res) => {
   res.send("server is up");

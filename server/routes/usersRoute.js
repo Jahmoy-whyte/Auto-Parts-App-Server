@@ -66,12 +66,13 @@ Route.post("/login", async (req, res, next) => {
     // sign refresh token
     const refreshToken = Jwt.sign(user, REFRESH_TOKEN_SECRET);
     // save refresh token to table
-    await dbSaveRefreshToken(user.id, refreshToken);
+    const refreshTokenTokenId = await dbSaveRefreshToken(user.id, refreshToken);
 
     res.status(200).json({
       res: {
         accessToken: accessToken,
         refreshToken: refreshToken,
+        refreshTokenTokenId: refreshTokenTokenId,
       },
       status: "ok",
     });
@@ -93,12 +94,13 @@ Route.post("/login/guest", async (req, res, next) => {
     });
     const refreshToken = Jwt.sign(user, REFRESH_TOKEN_SECRET);
     // Save Refresh Token
-    await dbSaveRefreshToken(user.id, refreshToken);
+    const refreshTokenTokenId = await dbSaveRefreshToken(user.id, refreshToken);
 
     res.status(200).json({
       res: {
         accessToken: accessToken,
         refreshToken: refreshToken,
+        refreshTokenTokenId: refreshTokenTokenId,
       },
       status: "ok",
     });
@@ -115,13 +117,15 @@ Route.post(
     try {
       const email = req.body.email;
       const password = req.body.password;
+      const refreshTokenTokenId = req.body.refreshTokenTokenId;
+
       const { id } = req.user;
 
       if (await dbUserExist(email))
         throw new CustomError(409, "User already exist");
       const hashedpassword = await hashPassword(password);
       const userId = id;
-      await dbLogoutUser(userId);
+      await dbLogoutUser(userId, refreshTokenTokenId);
       await dbUpdateGuestToUser(userId, email, hashedpassword, "user");
 
       res
@@ -133,15 +137,17 @@ Route.post(
   }
 );
 
-Route.get(
+Route.post(
   "/logout",
   verifyJwtToken,
   isPermitted(USERS_AND_GUESTS),
   async (req, res, next) => {
     try {
       const { id } = req.user;
+
+      const { refreshTokenTokenId } = req.body;
       const userId = id;
-      await dbLogoutUser(userId);
+      await dbLogoutUser(userId, refreshTokenTokenId);
       res.status(200).json({ res: "logout successful", status: "ok" });
     } catch (error) {
       next(error);

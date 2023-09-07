@@ -6,6 +6,8 @@ export const dbSaveRefreshToken = async (userId, refreshToken) => {
      (user_id ,refresh_token ,valid_until) VALUES(?,?,?)`,
     [userId, refreshToken, ""]
   );
+
+  return result.insertId;
 };
 
 export const dbCompareRefreshToken = async (refreshToken) => {

@@ -10,7 +10,7 @@ export const dbInsertOrder = async (userId, address, total) => {
 
 export const dbInsertOrderItems = async (orderId, productsArray) => {
   const newProductsArray = productsArray.map((item) => {
-    return [orderId, item.id, item.quantity];
+    return [orderId, item.productId, item.quantity];
   });
 
   const query =
@@ -40,5 +40,85 @@ export const dbGetUserOrders = async (userId) => {
     WHERE user_id = ?`,
     [userId]
   );
+  return result;
+};
+
+export const dbGetUserOrderDetail = async (orderId) => {
+  const products = `
+  products.product_id AS productId,
+  product_name AS productName,
+  make_id AS makeId,
+  model_id AS modelId,
+  subcategory_id AS subCategory,
+  description,
+  price,
+  new_arrival	AS newArrival,
+  condition_of_part AS conditionOfPart,
+  image`;
+
+  const [result1] = await pool.execute(
+    `SELECT
+    
+    orders.order_id AS id,	
+    user_id	AS userId,
+    address,	
+    date,	
+    total,	
+    status
+
+    FROM orders 
+    WHERE orders.order_id  = ?`,
+    [orderId]
+  );
+
+  const [result2] = await pool.execute(
+    `SELECT
+
+    order_items_id AS id,
+    quantity,
+    ${products}
+
+    FROM order_items 
+    LEFT JOIN products ON products.product_id = order_items.product_id
+    WHERE order_items.order_id  = ?`,
+    [orderId]
+  );
+
+  if (result1.length < 1) return [];
+
+  result1[0].items = result2;
+  return result1;
+};
+
+export const dbGetAllOrders = async () => {
+  const products = `
+  products.product_id AS productId,
+  product_name AS productName,
+  make_id AS makeId,
+  model_id AS modelId,
+  subcategory_id AS subCategory,
+  description,
+  price,
+  new_arrival	AS newArrival,
+  condition_of_part AS conditionOfPart,
+  image`;
+
+  const [result] = await pool.execute(
+    `SELECT
+    
+    orders.order_id AS id,	
+    user_id	AS userId,
+    address,	
+    date,	
+    total,	
+    status,
+    order_items_id AS id,
+    quantity
+
+    FROM orders 
+
+    LEFT JOIN order_items ON orders.order_id = order_items.order_id`
+  );
+
   return result;
 };

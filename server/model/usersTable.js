@@ -84,12 +84,12 @@ export const dbUpdateGuestToUser = async (userId, email, hashedpassword) => {
   console.log(result);
 };
 
-export const dbLogoutUser = async (userId) => {
+export const dbLogoutUser = async (userId, refreshTokenTokenId) => {
   const [result] = await pool.execute(
     `DELETE FROM refresh_token
-    WHERE user_id =?
+    WHERE user_id =? AND  token_id =?
     `,
-    [userId]
+    [userId, refreshTokenTokenId]
   );
 };
 

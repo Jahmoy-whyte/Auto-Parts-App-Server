@@ -116,3 +116,34 @@ export const dbGetProductById = async (productId) => {
   );
   return result;
 };
+
+export const dbProuductPagination = async (start) => {
+  const [result] = await pool.execute(
+    `SELECT 
+    product_id AS id,
+    product_name AS productName,
+    subcategory_id AS subCategory,
+    description,
+    price,
+    new_arrival	AS newArrival,
+    condition_of_part AS conditionOfPart,
+    image,
+    make.make,
+    model.model,
+    year.year
+
+    FROM products 
+    LEFT JOIN make ON  products.make_id = make.make_id
+    LEFT JOIN model ON  products.model_id = model.model_id
+    LEFT JOIN year ON  products.year_id = year.year_id
+
+    WHERE product_id > ?
+    
+    ORDER BY product_id ASC
+
+    LIMIT 10`,
+    [start]
+  );
+
+  return result;
+};
