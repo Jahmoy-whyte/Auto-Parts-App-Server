@@ -24,17 +24,28 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   /* options */
+  cors: {
+    credentials: true,
+    origin: "http://localhost:5173",
+  },
 });
 
-io.use(socketVerifyJwtToken);
-io.use(socketIsPermitted(USER_ONLY));
+//io.use(socketVerifyJwtToken);
+//io.use(socketIsPermitted(USER_ONLY));
 
 io.on("connection", (socket) => {
   console.log(socket.id);
 
-  socket.on("hello", (arg) => {
+  socket.on("OrderSent", (msg) => {
+    // console.log(socket.handshake.auth.token);
+    console.log(msg);
+    socket.broadcast.emit("OrderSent-res", msg);
+  });
+
+  socket.on("OrderUpdate", (arg) => {
     // console.log(socket.handshake.auth.token);
     console.log(arg);
+    socket.broadcast.emit("OrderUpdate-res", arg);
   });
 });
 
@@ -52,8 +63,8 @@ app.use("/users", usersRoute);
 app.use("/refreshtoken", refreshTokenRoute);
 app.use("/employee", employeeRoute);
 app.use("/orders", ordersRoute);
-//app.use(verifyJwtToken);
-//app.use(isPermitted(USERS_AND_GUESTS));
+app.use(verifyJwtToken);
+app.use(isPermitted(USERS_AND_GUESTS));
 
 app.use("/products", productsRoute);
 app.use("/make", makeRoute);

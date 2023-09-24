@@ -3,6 +3,12 @@ import {
   dbEmployeeExist,
   dbCreateEmployeeAccount,
   dbLogoutEmployee,
+  dbCountEmployees,
+  dbGetAllEmployees,
+  dbEmployeeSearch,
+  dbEmployeeUpdate,
+  dbGetEmployeeById,
+  dbDeleteEmployee,
 } from "../model/employeeTable.js";
 import bcrypt from "bcrypt";
 import { randomUUID } from "crypto";
@@ -19,7 +25,8 @@ import isPermitted from "../middleware/isPermitted.js";
 import verifyJwtToken from "../middleware/verifyJwtToken.js";
 import cookieParser from "cookie-parser";
 import verifyJwtEmployeeToken from "../middleware/verifyJwtEmployeeToken.js";
-
+import { ADMIN_AND_EMPLOYEE } from "../helper/permission.js";
+import { comparePassword, hashPassword } from "../helper/bcryptHelper.js";
 const Route = Router();
 
 const EMPLOYEE_ACCESS_TOKEN_SECRET = process.env.EMPLOYEE_ACCESS_TOKEN_SECRET;
@@ -27,7 +34,7 @@ const EMPLOYEE_REFRESH_TOKEN_SECRET = process.env.EMPLOYEE_REFRESH_TOKEN_SECRET;
 
 Route.post("/signup", async (req, res, next) => {
   try {
-    const { email, password, firstName, lastName } = req.body;
+    const { email, password, firstName, lastName, role } = req.body;
     const user = await dbEmployeeExist(email);
     if (user.length) throw new CustomError(409, "Employee already exist");
 
@@ -38,7 +45,7 @@ Route.post("/signup", async (req, res, next) => {
       lastName,
       email,
       hashedpassword,
-      "admin"
+      role
     );
 
     res.status(200).json({ res: "Account created successfully", status: "ok" });
@@ -74,7 +81,7 @@ Route.post("/login", async (req, res, next) => {
     // res.cookie("tokens", "tokens");
 
     res.cookie("refreshToken", refreshToken, {
-      maxAge: 900000,
+      //maxAge: 900000,
       httpOnly: true,
     });
 
@@ -133,13 +140,116 @@ Route.post("/refreshtoken", async (req, res, next) => {
   }
 });
 
-const comparePassword = async (password, hashedpassword) => {
-  return await bcrypt.compare(password, hashedpassword);
-};
+Route.get(
+  "/count-all-employees",
+  verifyJwtToken,
+  isPermitted(ADMIN_AND_EMPLOYEE),
 
-const hashPassword = async (password) => {
-  const hashedpassword = await bcrypt.hash(password, 10);
-  return hashedpassword;
-};
+  async (req, res, next) => {
+    try {
+      const count = await dbCountEmployees();
+      res.status(200).json({
+        res: count,
+        status: "ok",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+Route.get(
+  "/all-employees/:start/:end",
+  verifyJwtToken,
+  isPermitted(ADMIN_AND_EMPLOYEE),
+  async (req, res, next) => {
+    const { start, end } = req.params;
+    try {
+      const employees = await dbGetAllEmployees(start, end);
+      res.status(200).json({
+        res: employees,
+        status: "ok",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+Route.get(
+  "/employee-search/:filter/:searchText",
+  verifyJwtToken,
+  isPermitted(ADMIN_AND_EMPLOYEE),
+  async (req, res, next) => {
+    const { filter, searchText } = req.params;
+    try {
+      const employees = await dbEmployeeSearch(filter, searchText);
+      res.status(200).json({
+        res: employees,
+        status: "ok",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+Route.patch(
+  "/employee-update",
+  verifyJwtToken,
+  isPermitted(ADMIN_AND_EMPLOYEE),
+  async (req, res, next) => {
+    const employeeData = req.body.employeeData;
+    console.log(employeeData);
+    try {
+      await dbEmployeeUpdate(employeeData);
+      res.status(200).json({
+        res: "Account update was successful",
+        status: "ok",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+Route.get(
+  "/employee-by-id/:id",
+  verifyJwtToken,
+  isPermitted(ADMIN_AND_EMPLOYEE),
+  async (req, res, next) => {
+    const id = req.params.id;
+
+    try {
+      const employee = await dbGetEmployeeById(id);
+      if (employee.length < 1)
+        throw new CustomError(404, "Employee account not found");
+      res.status(200).json({
+        res: employee[0],
+        status: "ok",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+Route.delete(
+  "/",
+  verifyJwtToken,
+  isPermitted(ADMIN_AND_EMPLOYEE),
+  async (req, res, next) => {
+    const employeeId = req.body.employeeId;
+    try {
+      await dbDeleteEmployee(employeeId);
+      res.status(200).json({
+        res: "delete successful",
+        status: "ok",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 
 export default Route;

@@ -2,6 +2,7 @@ import CustomError from "../helper/CustomError.js";
 const isPermitted = (permissions) => {
   return (req, res, next) => {
     console.log("THIS RAN ===========");
+    console.log(permissions);
     const userStatus = req.user.userStatus;
     const permit = permissions;
 

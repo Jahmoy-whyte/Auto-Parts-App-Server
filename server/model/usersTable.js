@@ -118,3 +118,173 @@ export const dbUpdateSelectedAddress = async (addressId, id) => {
 
   return result.affectedRows;
 };
+
+export const dbGetAllUsers = async (start, end) => {
+  const [result] = await pool.execute(
+    `
+  SELECT 
+  
+  users.user_id as id,
+  user_status AS userStatus,
+  emailverified AS emailVerified,
+  selected_address_id  AS address_id,
+  email,
+  firstname AS firstName,
+  lastname AS lastName,
+  phone,
+  address,	
+  additional_info	AS additionalInfo,
+  place_type AS placeType
+
+  FROM users 
+
+  LEFT JOIN address ON users.selected_address_id = address.address_id
+  LIMIT ? OFFSET ?
+  `,
+    [end, start]
+  );
+  return result;
+};
+
+export const dbCountUsers = async () => {
+  const [result] = await pool.execute(
+    `
+  SELECT COUNT(user_id) AS count
+  FROM users 
+  `
+  );
+  return result[0];
+};
+
+export const dbUserSearch = async (filter, searchText) => {
+  const likeText = "%" + searchText + "%";
+  const [result] = await pool.execute(
+    `
+    SELECT 
+    
+    users.user_id as id,
+    user_status AS userStatus,
+    emailverified AS emailVerified,
+    selected_address_id  AS address_id,
+    email,
+    firstname AS firstName,
+    lastname AS lastName,
+    phone,
+    address,	
+    additional_info	AS additionalInfo,
+    place_type AS placeType
+  
+    FROM users 
+  
+    LEFT JOIN address ON users.selected_address_id = address.address_id
+    WHERE ${filter} LIKE ?
+    LIMIT 10
+    `,
+    [likeText]
+  );
+
+  return result;
+};
+
+/*
+
+
+Full texts
+user_id	
+user_status	
+email	
+emailverified	
+password	
+firstname	
+lastname	
+phone	
+selected_address_id
+*/
+export const dbAddUser = async (userData) => {
+  const [result] = await pool.execute(
+    `INSERT INTO users 
+    (
+      user_id	,
+      user_status	,
+      email	,
+      emailverified,
+      password	,
+      firstname,	
+      lastname,	
+      phone	
+    ) 
+    
+    VALUES(?,?,?,?,?,?,?,?)
+    `,
+    [
+      userData.userId,
+      userData.userStatus,
+      userData.email,
+      userData.emailVerified,
+      userData.password,
+      userData.firstName,
+      userData.lastName,
+      userData.phone,
+    ]
+  );
+};
+
+export const dbUserUpdate = async (userData) => {
+  const [result] = await pool.execute(
+    `UPDATE users SET 
+    user_status=?		,
+    email=?		,
+    emailverified=?	,	
+    firstname=?	,	
+    lastname=?	,	
+    phone	=?	
+    WHERE user_id=?`,
+    [
+      userData.userStatus,
+      userData.email,
+      userData.emailVerified,
+      userData.firstName,
+      userData.lastName,
+      userData.phone,
+      userData.userId,
+    ]
+  );
+
+  return result;
+};
+
+export const dbDeleteUser = async (userId) => {
+  const [result] = await pool.execute(`DELETE FROM users WHERE user_id = ?`, [
+    userId,
+  ]);
+
+  return result;
+};
+
+export const dbGetUserById = async (userId) => {
+  const [result] = await pool.execute(
+    `
+    SELECT 
+    
+    users.user_id as id,
+    user_status AS userStatus,
+    emailverified AS emailVerified,
+    selected_address_id  AS address_id,
+    email,
+    firstname AS firstName,
+    lastname AS lastName,
+    phone,
+    address,	
+    additional_info	AS additionalInfo,
+    place_type AS placeType
+  
+    FROM users 
+
+    LEFT JOIN address ON users.selected_address_id = address.address_id
+    WHERE users.user_id = ?
+    `,
+    [userId]
+  );
+
+  return result;
+};

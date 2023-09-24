@@ -25,3 +25,25 @@ export const dbGetMakeInfo = async () => {
   );
   return result;
 };
+
+export const dbAddMake = async (make) => {
+  const [result] = await pool.execute(`INSERT INTO make (make) VALUES ?`, [
+    make,
+  ]);
+  return result.insertId;
+};
+
+export const dbUpdateMake = async (makeId) => {
+  const [result] = await pool.execute(
+    `UPDATE make SET make =? WHERE make_id =?`,
+    [makeId]
+  );
+  return result;
+};
+
+export const dbDeleteMake = async (makeId) => {
+  const [result] = await pool.execute(`DELETE FROM make WHERE make_id =?`, [
+    makeId,
+  ]);
+  return result;
+};

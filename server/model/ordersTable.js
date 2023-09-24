@@ -56,17 +56,25 @@ export const dbGetUserOrderDetail = async (orderId) => {
   condition_of_part AS conditionOfPart,
   image`;
 
+  const user = `
+  email,	
+  firstname AS firstName,
+  lastname	AS lastName
+  `;
+
   const [result1] = await pool.execute(
     `SELECT
     
     orders.order_id AS id,	
-    user_id	AS userId,
+    orders.user_id	AS userId,
     address,	
     date,	
     total,	
-    status
+    status,
+    ${user}
 
     FROM orders 
+    LEFT JOIN users ON orders.user_id  = users.user_id
     WHERE orders.order_id  = ?`,
     [orderId]
   );
@@ -112,7 +120,7 @@ export const dbGetAllOrders = async () => {
     date,	
     total,	
     status,
-    order_items_id AS id,
+    order_items_id AS orderItemsId,
     quantity
 
     FROM orders 
@@ -121,4 +129,79 @@ export const dbGetAllOrders = async () => {
   );
 
   return result;
+};
+
+export const dbGetOrdersOnCondition = async (status) => {
+  const user = `
+  email,	
+  firstname AS firstName,
+  lastname	AS lastName
+  `;
+
+  const [result] = await pool.execute(
+    `SELECT
+    
+    orders.order_id AS id,	
+    orders.user_id	AS userId,
+    address,	
+    date,	
+    total,	
+    status,
+    ${user}
+
+    FROM orders 
+    LEFT JOIN users ON orders.user_id = users.user_id
+
+    WHERE orders.status = ?
+    `,
+    [status]
+  );
+
+  return result;
+};
+
+export const dbOrdersSearch = async (status, filter, searchText) => {
+  const user = `
+
+  email,	
+  firstname AS firstName,
+  lastname	AS lastName
+  `;
+
+  const likeText = "%" + searchText + "%";
+  const [result] = await pool.execute(
+    `SELECT
+    
+    orders.order_id AS id,	
+    orders.user_id	AS userId,
+    address,	
+    date,	
+    total,	
+    status,
+    ${user}
+
+    FROM orders 
+    LEFT JOIN users ON orders.user_id = users.user_id
+
+    WHERE orders.status = ? AND orders.${filter} LIKE ? 
+    `,
+    [status, likeText]
+  );
+  console.log(result);
+  return result;
+};
+
+export const dbUpdateOrderStatus = async (orderId, status) => {
+  const [result] = await pool.execute(
+    `
+  UPDATE orders SET status=?
+  WHERE order_id =?`,
+    [status, orderId]
+  );
+};
+
+export const dbDeleteOrders = async (orderId) => {
+  const [result] = await pool.execute(`DELETE FROM orders WHERE order_id =?`, [
+    orderId,
+  ]);
 };
