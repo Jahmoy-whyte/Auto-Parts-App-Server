@@ -370,6 +370,7 @@ Route.delete(
     }
   }
 );
+
 const comparePassword = async (password, hashedpassword) => {
   return await bcrypt.compare(password, hashedpassword);
 };

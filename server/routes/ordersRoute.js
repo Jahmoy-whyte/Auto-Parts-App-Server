@@ -8,6 +8,7 @@ import {
   dbGetUserOrders,
   dbInsertOrder,
   dbInsertOrderItems,
+  dbOrdersCount,
   dbOrdersSearch,
   dbUpdateOrderStatus,
 } from "../model/ordersTable.js";
@@ -58,10 +59,19 @@ Route.get("/orders/get", async (req, res, next) => {
   }
 });
 
-Route.get("/orders/get/:status", async (req, res, next) => {
+Route.get("/orders/count-orders", async (req, res, next) => {
   try {
-    const status = req.params.status;
-    const orders = await dbGetOrdersOnCondition(status);
+    const orders = await dbOrdersCount();
+    res.status(200).json({ res: orders[0], status: "ok" });
+  } catch (error) {
+    next(error);
+  }
+});
+
+Route.get("/orders/get/:status/:start/:limit", async (req, res, next) => {
+  try {
+    const { status, start, limit } = req.params;
+    const orders = await dbGetOrdersOnCondition(status, start, limit);
     res.status(200).json({ res: orders, status: "ok" });
   } catch (error) {
     next(error);
@@ -102,3 +112,25 @@ Route.delete("/", async (req, res, next) => {
 });
 
 export default Route;
+
+/*
+
+
+Route.get("/orders/sales", async (req, res, next) => {
+  try {
+    const sales = await dbGetSales();
+    res.status(200).json({ res: sales, status: "ok" });
+  } catch (error) {
+    next(error);
+  }
+});
+
+Route.get("/orders/average-daily-sales", async (req, res, next) => {
+  try {
+    const average = await dbAverageDailySales();
+    res.status(200).json({ res: average[0], status: "ok" });
+  } catch (error) {
+    next(error);
+  }
+});
+*/

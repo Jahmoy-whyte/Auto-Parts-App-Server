@@ -1,7 +1,7 @@
 import { pool } from "../helper/databaseConnection.js";
 
 export const dbGetMake = async () => {
-  const [result] = await pool.execute(`SELECT make , make_id AS id FROM make`);
+  const [result] = await pool.execute(`SELECT make, make_id AS id FROM make`);
   return result;
 };
 
@@ -26,17 +26,26 @@ export const dbGetMakeInfo = async () => {
   return result;
 };
 
+export const dbGetMakes = async () => {
+  const [result] = await pool.execute(
+    `SELECT make AS data , make_id AS id FROM make`
+  );
+  return result;
+};
+
 export const dbAddMake = async (make) => {
-  const [result] = await pool.execute(`INSERT INTO make (make) VALUES ?`, [
-    make,
-  ]);
+  const [result] = await pool.execute(
+    `INSERT 
+  INTO make (make) VALUES (?)`,
+    [make]
+  );
   return result.insertId;
 };
 
-export const dbUpdateMake = async (makeId) => {
+export const dbUpdateMake = async (makeId, make) => {
   const [result] = await pool.execute(
     `UPDATE make SET make =? WHERE make_id =?`,
-    [makeId]
+    [make, makeId]
   );
   return result;
 };

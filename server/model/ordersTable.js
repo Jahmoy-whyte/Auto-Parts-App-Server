@@ -68,7 +68,7 @@ export const dbGetUserOrderDetail = async (orderId) => {
     orders.order_id AS id,	
     orders.user_id	AS userId,
     address,	
-    date,	
+    orders.date,	
     total,	
     status,
     ${user}
@@ -113,11 +113,11 @@ export const dbGetAllOrders = async () => {
 
   const [result] = await pool.execute(
     `SELECT
-    
+
     orders.order_id AS id,	
     user_id	AS userId,
     address,	
-    date,	
+    orders.date,	
     total,	
     status,
     order_items_id AS orderItemsId,
@@ -131,7 +131,7 @@ export const dbGetAllOrders = async () => {
   return result;
 };
 
-export const dbGetOrdersOnCondition = async (status) => {
+export const dbGetOrdersOnCondition = async (status, start, limit) => {
   const user = `
   email,	
   firstname AS firstName,
@@ -140,11 +140,11 @@ export const dbGetOrdersOnCondition = async (status) => {
 
   const [result] = await pool.execute(
     `SELECT
-    
+  
     orders.order_id AS id,	
     orders.user_id	AS userId,
     address,	
-    date,	
+    orders.date,	
     total,	
     status,
     ${user}
@@ -152,9 +152,12 @@ export const dbGetOrdersOnCondition = async (status) => {
     FROM orders 
     LEFT JOIN users ON orders.user_id = users.user_id
 
-    WHERE orders.status = ?
+    WHERE orders.status = ? 
+    ORDER BY orders.date 
+    LIMIT ?  OFFSET ?
+  
     `,
-    [status]
+    [status, limit, start]
   );
 
   return result;
@@ -175,7 +178,7 @@ export const dbOrdersSearch = async (status, filter, searchText) => {
     orders.order_id AS id,	
     orders.user_id	AS userId,
     address,	
-    date,	
+    orders.date,	
     total,	
     status,
     ${user}
@@ -205,3 +208,49 @@ export const dbDeleteOrders = async (orderId) => {
     orderId,
   ]);
 };
+
+export const dbOrdersCount = async () => {
+  const [result] = await pool.execute(
+    `SELECT
+   
+    COUNT( CASE WHEN status = 'sent' THEN 1 END) AS sent,
+    COUNT( CASE WHEN status = 'transit' THEN 1 END) AS transit,
+    COUNT( CASE WHEN status = 'delivered' THEN 1 END) AS delivered,
+    COUNT( CASE WHEN status = 'cancelled' THEN 1 END) AS cancelled
+
+  
+
+    FROM orders 
+    
+    `
+  );
+
+  return result;
+};
+
+// export const dbGetSales = async () => {
+//   const [result] = await pool.execute(
+//     `SELECT
+//     DATE_FORMAT(date,'%M') AS month,
+//     SUM(total) AS total
+//     FROM orders
+//     GROUP BY DATE_FORMAT(date,'%M')
+//     ORDER BY Month(date)
+//    `
+//   );
+
+//   return result;
+// };
+
+// export const dbAverageDalySales = async () => {
+//   const [result] = await pool.execute(
+//     `SELECT
+//     AVG(total) AS Average
+//     FROM orders
+//     GROUP BY DATE(date,'%M')
+//     ORDER BY Month(date)
+//    `
+//   );
+
+//   return result;
+// };

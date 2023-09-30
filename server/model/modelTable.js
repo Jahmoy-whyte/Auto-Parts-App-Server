@@ -14,33 +14,39 @@ export const dbGetModels = async () => {
   const [result] = await pool.execute(
     `SELECT
 
-    model_id AS id 
-    make_id AS makeId,
-    model,
- 
-    FROM model `
+    model_id AS id,
+    model.make_id AS makeId,
+    make,
+    model
+     
+    FROM model 
+    JOIN make ON model.make_id = make.make_id
+    ORDER BY model.make_id
+    `
   );
   return result;
 };
 
-export const dbAddModel = async (make) => {
-  const [result] = await pool.execute(`INSERT INTO make (make) VALUES ?`, [
-    make,
-  ]);
+export const dbAddModel = async (makeId, model) => {
+  const [result] = await pool.execute(
+    `INSERT INTO model 
+    (make_id , model) VALUES (?,?)`,
+    [makeId, model]
+  );
   return result.insertId;
 };
 
-export const dbUpdateModel = async (makeId) => {
+export const dbUpdateModel = async (makeId, model, modelId) => {
   const [result] = await pool.execute(
-    `UPDATE make SET make =? WHERE make_id =?`,
-    [makeId]
+    `UPDATE model SET make_id =? , model =? WHERE model_id =?`,
+    [makeId, model, modelId]
   );
   return result;
 };
 
-export const dbDeleteModel = async (makeId) => {
-  const [result] = await pool.execute(`DELETE FROM make WHERE make_id =?`, [
-    makeId,
+export const dbDeleteModel = async (modelId) => {
+  const [result] = await pool.execute(`DELETE FROM model WHERE model_id =?`, [
+    modelId,
   ]);
   return result;
 };

@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   dbGetMakeInfo,
   dbGetMake,
+  dbGetMakes,
   dbAddMake,
   dbUpdateMake,
   dbDeleteMake,
@@ -22,11 +23,20 @@ Route.get("/", async (req, res, next) => {
 
 Route.use(isPermitted(ADMIN_ONLY));
 
+Route.get("/get", async (req, res, next) => {
+  try {
+    const data = await dbGetMakes();
+    res.status(200).json({ res: data, status: "ok" });
+  } catch (error) {
+    next(error);
+  }
+});
+
 Route.post("/", async (req, res, next) => {
   try {
     const make = req.body.make;
     const insertId = await dbAddMake(make);
-    res.status(200).json({ res: insertId, status: "ok" });
+    res.status(200).json({ res: "insert successful", status: "ok" });
   } catch (error) {
     next(error);
   }
@@ -34,8 +44,8 @@ Route.post("/", async (req, res, next) => {
 
 Route.patch("/", async (req, res, next) => {
   try {
-    const makeId = req.body.makeId;
-    await dbUpdateMake(makeId);
+    const { makeId, make } = req.body;
+    await dbUpdateMake(makeId, make);
     res.status(200).json({ res: "update successful", status: "ok" });
   } catch (error) {
     next(error);
@@ -46,7 +56,7 @@ Route.delete("/", async (req, res, next) => {
   try {
     const makeId = req.body.makeId;
     await dbDeleteMake(makeId);
-    res.status(200).json({ res: data, status: "ok" });
+    res.status(200).json({ res: "delete successful", status: "ok" });
   } catch (error) {
     next(error);
   }

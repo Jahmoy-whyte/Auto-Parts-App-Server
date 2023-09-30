@@ -81,7 +81,7 @@ Route.post("/login", async (req, res, next) => {
     // res.cookie("tokens", "tokens");
 
     res.cookie("refreshToken", refreshToken, {
-      //maxAge: 900000,
+      maxAge: 10000,
       httpOnly: true,
     });
 

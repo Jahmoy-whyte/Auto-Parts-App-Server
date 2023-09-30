@@ -20,6 +20,7 @@ import socketVerifyJwtToken from "./server/middleware/socketVerifyJwtToken.js";
 import socketIsPermitted from "./server/middleware/socketIsPermitted.js";
 import employeeRoute from "./server/routes/employeeRoute.js";
 import cookieParser from "cookie-parser";
+import dashBoardRoute from "./server/routes/dashBoardRoute.js";
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
@@ -53,16 +54,19 @@ const port = process.env.PORT || 3000;
 
 const corsConfig = {
   credentials: true,
-  origin: "http://localhost:5173",
+  origin: ["http://localhost:5173", "https://tqpq2cws-5173.use2.devtunnels.ms"],
 };
 app.use(cors(corsConfig));
 app.use(express.json());
 app.use(cookieParser());
 
+app.use("/dashboard", dashBoardRoute);
+
 app.use("/users", usersRoute);
 app.use("/refreshtoken", refreshTokenRoute);
 app.use("/employee", employeeRoute);
 app.use("/orders", ordersRoute);
+
 app.use(verifyJwtToken);
 app.use(isPermitted(USERS_AND_GUESTS));
 
