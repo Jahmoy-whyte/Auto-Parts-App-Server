@@ -1,8 +1,9 @@
-import CustomError from "../helper/CustomError.js";
-const isPermitted = (permissions) => {
+import CustomError from "../../helper/CustomError.js";
+const userIsPermitted = (permissions) => {
   return (req, res, next) => {
     console.log("THIS RAN ===========");
     console.log(permissions);
+    console.log(req.user);
     const userStatus = req.user.userStatus;
     const permit = permissions;
 
@@ -14,4 +15,4 @@ const isPermitted = (permissions) => {
     }
   };
 };
-export default isPermitted;
+export default userIsPermitted;

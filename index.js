@@ -6,12 +6,9 @@ import yearRoute from "./server/routes/yearRoute.js";
 import categoriesRoute from "./server/routes/categoriesRoute.js";
 import usersRoute from "./server/routes/usersRoute.js";
 import cors from "cors";
-import verifyJwtToken from "./server/middleware/verifyJwtToken.js";
 import globalErrorHandler from "./server/helper/globalErrorHandler.js";
 import cartRoute from "./server/routes/cartRoute.js";
 import refreshTokenRoute from "./server/routes/refreshTokenRoute.js";
-import isPermitted from "./server/middleware/isPermitted.js";
-import { USERS_AND_GUESTS, USER_ONLY } from "./server/helper/permission.js";
 import addressRoute from "./server/routes/addressRoute.js";
 import ordersRoute from "./server/routes/ordersRoute.js";
 import { createServer } from "http";
@@ -66,9 +63,6 @@ app.use("/users", usersRoute);
 app.use("/refreshtoken", refreshTokenRoute);
 app.use("/employee", employeeRoute);
 app.use("/orders", ordersRoute);
-
-app.use(verifyJwtToken);
-app.use(isPermitted(USERS_AND_GUESTS));
 
 app.use("/products", productsRoute);
 app.use("/make", makeRoute);

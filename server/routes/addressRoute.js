@@ -1,54 +1,48 @@
 import { Router } from "express";
 import {
-  dbAddAddress,
-  dbDeleteAddress,
-  dbGetAddress,
-  dbSearchForLocation,
-} from "../model/addressTable.js";
+  getAddress,
+  addAddress,
+  deleteAddress,
+  searchForLocation,
+} from "../controller/addressController.js";
+import employeeVerifyJwtToken from "../middleware/employee-middle-ware/employeeVerifyJwtToken.js";
+import employeeIsPermitted from "../middleware/employee-middle-ware/employeeIsPermitted.js";
+import userVerifyJwtToken from "../middleware/user-middle-ware/userVerifyJwtToken.js";
+import userIsPermitted from "../middleware/user-middle-ware/userIsPermitted.js";
+import {
+  ADMIN_AND_EMPLOYEE,
+  USER_ONLY,
+  USERS_AND_GUESTS,
+} from "../helper/permission.js";
 
 const Route = Router();
 
-Route.get("/", async (req, res, next) => {
-  try {
-    const { id } = req.user;
-    const addresses = await dbGetAddress(id);
-    res.status(200).json({ res: addresses, status: "ok" });
-    console.log("get address");
-  } catch (error) {
-    next(error);
-  }
-});
+Route.get(
+  "/",
+  userVerifyJwtToken,
+  userIsPermitted(USERS_AND_GUESTS),
+  getAddress
+);
 
-Route.post("/", async (req, res, next) => {
-  try {
-    const { id } = req.user;
-    const { address, additionalInfo, placeType } = req.body;
-    await dbAddAddress(id, address, additionalInfo, placeType);
-    res.status(200).json({ res: "address was added", status: "ok" });
-  } catch (error) {
-    next(error);
-  }
-});
+Route.post(
+  "/",
+  userVerifyJwtToken,
+  userIsPermitted(USERS_AND_GUESTS),
+  addAddress
+);
 
-Route.delete("/", async (req, res, next) => {
-  try {
-    const { addressId } = req.body;
-    await dbDeleteAddress(addressId);
-    res.status(200).json({ res: "deleted", status: "ok" });
-  } catch (error) {
-    next(error);
-  }
-});
+Route.delete(
+  "/",
+  userVerifyJwtToken,
+  userIsPermitted(USERS_AND_GUESTS),
+  deleteAddress
+);
 
-Route.get("/search-for-location/:name", async (req, res, next) => {
-  try {
-    const { name } = req.params;
-    const list = await dbSearchForLocation(name);
-    console.log(name);
-    res.status(200).json({ res: list, status: "ok" });
-  } catch (error) {
-    next(error);
-  }
-});
+Route.get(
+  "/search-for-location/:name",
+  userVerifyJwtToken,
+  userIsPermitted(USERS_AND_GUESTS),
+  searchForLocation
+);
 
 export default Route;

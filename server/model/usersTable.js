@@ -146,7 +146,7 @@ export const dbGetAllUsers = async (start, end) => {
   return result;
 };
 
-export const dbCountUsers = async () => {
+export const dbCountAllAccounts = async () => {
   const [result] = await pool.execute(
     `
   SELECT COUNT(user_id) AS count

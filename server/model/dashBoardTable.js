@@ -41,12 +41,30 @@ export const dbGetDashBoardData = async () => {
 // dwd,
 const dbGetSales = async () => {
   const [result] = await pool.execute(
-    `SELECT
-      DATE_FORwMAT(date,'%M') AS month,	
+    `
+    SELECT shortend_months_name AS shortendMonthsName  , monthlySales.month ,
+    
+    CASE WHEN monthlySales.total IS NULL THEN 0  ELSE  monthlySales.total  END AS total
+
+    FROM months 
+
+    LEFT JOIN (
+
+    SELECT
+      MONTHNAME(date) AS month,	
       SUM(total) AS total
       FROM orders 
-      GROUP BY DATE_FORMAT(date,'%M')	
-      ORDER BY Month(date)
+      WHERE YEAR(date) = YEAR(CURRENT_DATE)
+      GROUP BY MONTH(date)	
+     
+      ) AS monthlySales
+
+
+      ON months.month_name = monthlySales.month
+
+      
+      ORDER BY months.id
+     
      `
   );
   return result;
@@ -57,21 +75,21 @@ const dbAverageDailySales = async () => {
     `SELECT
       AVG(total) AS average
       FROM orders 
-      GROUP BY DAY(date)	
+     WHERE MONTH(date) = MONTH(CURRENT_DATE)
      `
   );
-  return result;
+  return result[0].average;
 };
 
 const dbGetGuestToUserRatio = async () => {
   const [result] = await pool.execute(
     `
     SELECT
-    DATE_FORMAT(date,'%M') AS month,
-    SUM(CASE WHEN user_status = 'user' THEN 1 ELSE 0 END) AS userCount,
-    SUM(CASE WHEN user_status = 'guest' THEN 1 ELSE 0 END) AS guestCount
+    MONTHNAME(date) AS month,
+    COUNT(CASE WHEN user_status = 'user' THEN 1 END) AS userCount,
+    COUNT(CASE WHEN user_status = 'guest' THEN 1 END) AS guestCount
     FROM users
-    GROUP BY MONTH(date)
+
     ;
     `
   );

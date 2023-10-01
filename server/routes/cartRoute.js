@@ -1,55 +1,49 @@
 import { Router } from "express";
+
 import {
-  dbGetUserCart,
-  dbAddToCart,
-  dbDeleteCartItem,
-  dbUpdateCartItem,
-} from "../model/cartTable.js";
+  getUserCart,
+  addToCart,
+  deleteCartItem,
+  updateCartItem,
+} from "../controller/cartController.js";
+import employeeVerifyJwtToken from "../middleware/employee-middle-ware/employeeVerifyJwtToken.js";
+import employeeIsPermitted from "../middleware/employee-middle-ware/employeeIsPermitted.js";
+import userVerifyJwtToken from "../middleware/user-middle-ware/userVerifyJwtToken.js";
+import userIsPermitted from "../middleware/user-middle-ware/userIsPermitted.js";
+import {
+  ADMIN_AND_EMPLOYEE,
+  USER_ONLY,
+  USERS_AND_GUESTS,
+} from "../helper/permission.js";
+
 const Route = Router();
 
-Route.get("/", async (req, res, next) => {
-  try {
-    const { id } = req.user;
-    const data = await dbGetUserCart(id);
-    res.status(200).json({ res: data, status: "ok" });
-    console.log("Get user cart");
-  } catch (error) {
-    next(error);
-  }
-});
+Route.get(
+  "/",
+  userVerifyJwtToken,
+  userIsPermitted(USERS_AND_GUESTS),
+  getUserCart
+);
 
-Route.post("/", async (req, res, next) => {
-  try {
-    const { id } = req.user; // get user id if they are verified
-    const { productId, quantity } = req.body;
-    const insertId = await dbAddToCart(id, productId, quantity);
-    res.status(200).json({ res: insertId, status: "ok" });
-    console.log("add to cart");
-  } catch (error) {
-    next(error);
-  }
-});
+Route.post(
+  "/",
+  userVerifyJwtToken,
+  userIsPermitted(USERS_AND_GUESTS),
+  addToCart
+);
 
-Route.delete("/", async (req, res, next) => {
-  try {
-    const { cartId } = req.body;
-    await dbDeleteCartItem(cartId);
-    res.status(200).json({ res: "deleted", status: "ok" });
-    console.log("item deleted");
-  } catch (error) {
-    next(error);
-  }
-});
+Route.delete(
+  "/",
+  userVerifyJwtToken,
+  userIsPermitted(USERS_AND_GUESTS),
+  deleteCartItem
+);
 
-Route.patch("/", async (req, res, next) => {
-  try {
-    const { quantity, cartId } = req.body;
-    await dbUpdateCartItem(quantity, cartId);
-    res.status(200).json({ res: "cart updated", status: "ok" });
-    console.log("item updated");
-  } catch (error) {
-    next(error);
-  }
-});
+Route.patch(
+  "/",
+  userVerifyJwtToken,
+  userIsPermitted(USERS_AND_GUESTS),
+  updateCartItem
+);
 
 export default Route;

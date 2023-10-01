@@ -9,7 +9,7 @@ export const dbEmployeeExist = async (email) => {
     lastname AS lastName,
     email,
     password,
-    role AS userStatus
+    role 
   
     FROM employee WHERE email=?`,
     [email]

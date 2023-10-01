@@ -27,9 +27,7 @@ export const dbGetMakeInfo = async () => {
 };
 
 export const dbGetMakes = async () => {
-  const [result] = await pool.execute(
-    `SELECT make AS data , make_id AS id FROM make`
-  );
+  const [result] = await pool.execute(`SELECT make, make_id AS id FROM make`);
   return result;
 };
 
