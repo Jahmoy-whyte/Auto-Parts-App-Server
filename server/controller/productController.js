@@ -10,6 +10,7 @@ import {
   dbAddProducts,
   dbUpdateProduct,
   dbDeleteProduct,
+  dbUserGetProductById,
 } from "../model/productsTable.js";
 
 const getNewArrival = async (req, res, next) => {
@@ -44,6 +45,19 @@ const getProductsByAttributesAndCategory = async (req, res, next) => {
     );
     res.status(200).json({ res: data, status: "ok" });
     console.log("product make, model, year, subCategory");
+  } catch (error) {
+    next(error);
+  }
+};
+
+const userGetProductById = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const { productId } = req.params;
+    const data = await dbUserGetProductById(productId, userId);
+    console.log(data);
+    res.status(200).json({ res: data, status: "ok" });
+    console.log("product by id");
   } catch (error) {
     next(error);
   }
@@ -141,6 +155,7 @@ export {
   addProducts,
   updateProduct,
   deleteProduct,
+  userGetProductById,
 };
 
 /*

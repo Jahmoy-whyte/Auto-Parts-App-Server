@@ -18,6 +18,7 @@ import socketIsPermitted from "./server/middleware/socketIsPermitted.js";
 import employeeRoute from "./server/routes/employeeRoute.js";
 import cookieParser from "cookie-parser";
 import dashBoardRoute from "./server/routes/dashBoardRoute.js";
+import favoritesRoute from "./server/routes/favoritesRoute.js";
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
@@ -71,6 +72,7 @@ app.use("/year", yearRoute);
 app.use("/categories", categoriesRoute);
 app.use("/cart", cartRoute);
 app.use("/address", addressRoute);
+app.use("/favorites", favoritesRoute);
 
 app.get("/", (req, res) => {
   res.send("server is up");

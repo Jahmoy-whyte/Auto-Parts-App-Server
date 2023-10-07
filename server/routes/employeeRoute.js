@@ -5,12 +5,14 @@ import {
   login,
   logout,
   refreshToken,
+  getAccount,
   countEmployees,
   getAllEmployees,
   employeeSearch,
   employeeUpdate,
   getEmployeeById,
   deleteEmployee,
+  InvalidateRefreshtoken,
 } from "../controller/employeeController.js";
 
 import employeeVerifyJwtToken from "../middleware/employee-middle-ware/employeeVerifyJwtToken.js";
@@ -39,7 +41,14 @@ Route.post(
   logout
 );
 
-Route.post("/refreshtoken", refreshToken);
+Route.get(
+  "/account",
+  employeeVerifyJwtToken,
+  employeeIsPermitted(ADMIN_AND_EMPLOYEE),
+  getAccount
+);
+
+Route.get("/refreshtoken", refreshToken);
 
 // Admin ============================================
 Route.get(
@@ -82,6 +91,13 @@ Route.delete(
   employeeVerifyJwtToken,
   employeeIsPermitted(ADMIN_ONLY),
   deleteEmployee
+);
+
+Route.delete(
+  "/invalidate-refresh-token/:id",
+  employeeVerifyJwtToken,
+  employeeIsPermitted(ADMIN_ONLY),
+  InvalidateRefreshtoken
 );
 
 export default Route;

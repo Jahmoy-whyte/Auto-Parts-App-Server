@@ -26,6 +26,7 @@ import {
   updateAccount,
   updateSelectedAddress,
   updateUserAccount,
+  InvalidateRefreshtoken,
 } from "../controller/userController.js";
 import employeeIsPermitted from "../middleware/employee-middle-ware/employeeIsPermitted.js";
 import employeeVerifyJwtToken from "../middleware/employee-middle-ware/employeeVerifyJwtToken.js";
@@ -129,6 +130,13 @@ Route.delete(
   employeeVerifyJwtToken,
   employeeIsPermitted(ADMIN_ONLY),
   deleteUser
+);
+
+Route.delete(
+  "/invalidate-refresh-token/:id",
+  employeeVerifyJwtToken,
+  employeeIsPermitted(ADMIN_ONLY),
+  InvalidateRefreshtoken
 );
 
 export default Route;

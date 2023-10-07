@@ -12,6 +12,7 @@ import {
   addProducts,
   updateProduct,
   deleteProduct,
+  userGetProductById,
 } from "../controller/productController.js";
 import userIsPermitted from "../middleware/user-middle-ware/userIsPermitted.js";
 import employeeVerifyJwtToken from "../middleware/employee-middle-ware/employeeVerifyJwtToken.js";
@@ -27,7 +28,7 @@ import {
 const Route = Router();
 
 Route.get(
-  "/",
+  "/get-new-arrival",
   userVerifyJwtToken,
   userIsPermitted(USERS_AND_GUESTS),
   getNewArrival
@@ -47,19 +48,26 @@ Route.get(
   getProductsByAttributesAndCategory
 );
 
+Route.get(
+  "/get-product-by-id/:productId",
+  userVerifyJwtToken,
+  userIsPermitted(USERS_AND_GUESTS),
+  userGetProductById
+);
+
+Route.get(
+  "/pagination/:lastId",
+  userVerifyJwtToken,
+  userIsPermitted(USERS_AND_GUESTS),
+  prouductPagination
+);
+
 // employee=============================================================
 Route.get(
   "/:productId",
   employeeVerifyJwtToken,
   employeeIsPermitted(ADMIN_AND_EMPLOYEE),
   getProductById
-);
-
-Route.get(
-  "/pagination/:lastId",
-  employeeVerifyJwtToken,
-  employeeIsPermitted(ADMIN_AND_EMPLOYEE),
-  prouductPagination
 );
 
 Route.get(

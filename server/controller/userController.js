@@ -14,6 +14,7 @@ import {
   dbAddUser,
   dbGetUserById,
   dbUserUpdate,
+  dbDeleteRefreshtoken,
 } from "../model/usersTable.js";
 
 import { randomUUID } from "crypto";
@@ -73,13 +74,12 @@ const login = async (req, res, next) => {
     // sign refresh token
     const refreshToken = Jwt.sign(user, REFRESH_TOKEN_SECRET);
     // save refresh token to table
-    const refreshTokenTokenId = await dbSaveRefreshToken(user.id, refreshToken);
+    await dbSaveRefreshToken(user.id, refreshToken);
 
     res.status(200).json({
       res: {
         accessToken: accessToken,
         refreshToken: refreshToken,
-        refreshTokenTokenId: refreshTokenTokenId,
       },
       status: "ok",
     });
@@ -101,13 +101,12 @@ const createGuestAccount = async (req, res, next) => {
     });
     const refreshToken = Jwt.sign(user, REFRESH_TOKEN_SECRET);
     // Save Refresh Token
-    const refreshTokenTokenId = await dbSaveRefreshToken(user.id, refreshToken);
+    await dbSaveRefreshToken(user.id, refreshToken);
 
     res.status(200).json({
       res: {
         accessToken: accessToken,
         refreshToken: refreshToken,
-        refreshTokenTokenId: refreshTokenTokenId,
       },
       status: "ok",
     });
@@ -120,7 +119,7 @@ const convertGuestToUser = async (req, res, next) => {
   try {
     const email = req.body.email;
     const password = req.body.password;
-    const refreshTokenTokenId = req.body.refreshTokenTokenId;
+    const refreshToken = req.body.refreshToken;
 
     const { id } = req.user;
 
@@ -128,7 +127,7 @@ const convertGuestToUser = async (req, res, next) => {
       throw new CustomError(409, "User already exist");
     const hashedpassword = await hashPassword(password);
     const userId = id;
-    await dbLogoutUser(userId, refreshTokenTokenId);
+    await dbLogoutUser(userId, refreshToken);
     await dbUpdateGuestToUser(userId, email, hashedpassword, USER);
 
     res.status(200).json({ res: "Account created successfully", status: "ok" });
@@ -141,9 +140,9 @@ const logout = async (req, res, next) => {
   try {
     const { id } = req.user;
 
-    const { refreshTokenTokenId } = req.body;
+    const { refreshToken } = req.body;
     const userId = id;
-    await dbLogoutUser(userId, refreshTokenTokenId);
+    await dbLogoutUser(userId, refreshToken);
     res.status(200).json({ res: "logout successful", status: "ok" });
   } catch (error) {
     next(error);
@@ -302,7 +301,21 @@ const deleteUser = async (req, res, next) => {
   }
 };
 
+const InvalidateRefreshtoken = async (req, res, next) => {
+  const id = req.params.id;
+  try {
+    await dbDeleteRefreshtoken(id);
+    res.status(200).json({
+      res: "Sign out successful",
+      status: "ok",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export {
+  InvalidateRefreshtoken,
   signup,
   login,
   createGuestAccount,

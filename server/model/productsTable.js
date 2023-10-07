@@ -14,6 +14,7 @@ export const dbGetNewArrival = async () => {
     price,
     new_arrival	AS newArrival,
     condition_of_part AS conditionOfPart,
+    status,
     image,
     make.make,
     model.model
@@ -40,9 +41,11 @@ export const dbSearchForProducts = async (makeId, modelId, yearId) => {
     price,
     new_arrival	AS newArrival,
     condition_of_part AS conditionOfPart,
+    status,
     image,
     make.make,
     model.model
+    
 
     FROM ((products 
     LEFT JOIN make ON  products.make_id = make.make_id)
@@ -91,25 +94,85 @@ export const dbSearchForProductWithCategory = async (
   return result;
 };
 
-export const dbGetProductById = async (productId) => {
+export const dbUserGetProductById = async (productId, userId) => {
   const [result] = await pool.execute(
     `SELECT 
-    product_id AS id,
+    products.product_id AS id,
     product_name AS productName,
-    subcategory_id AS subCategory,
+
     description,
     price,
     new_arrival	AS newArrival,
     condition_of_part AS conditionOfPart,
     image,
+    status,
+
+    subcategories.subcategory_name AS subCategory,
     make.make,
     model.model,
-    year.year
+    year.year,
+    
+    products.subcategory_id AS subCategoryId,
+    products.make_id AS makeId,
+    products.model_id AS modelId,
+    products.year_id AS yearId,
+
+    COUNT(favorite_id) AS favoriteBool,
+    favorite_id  AS favoriteId
+
+
 
     FROM products 
+
+
+    
+
+    LEFT JOIN favorite ON  products.product_id = favorite.product_id AND  favorite.user_id = ?
     LEFT JOIN make ON  products.make_id = make.make_id
     LEFT JOIN model ON  products.model_id = model.model_id
     LEFT JOIN year ON  products.year_id = year.year_id
+    LEFT JOIN subcategories ON  products.subcategory_id = subcategories.subcategory_id
+
+
+    WHERE products.product_id =? `,
+    [userId, productId]
+  );
+  return result;
+};
+
+export const dbGetProductById = async (productId) => {
+  const [result] = await pool.execute(
+    `SELECT 
+    product_id AS id,
+    product_name AS productName,
+
+    description,
+    price,
+    new_arrival	AS newArrival,
+    condition_of_part AS conditionOfPart,
+    image,
+    status,
+
+    subcategories.subcategory_name AS subCategory,
+    make.make,
+    model.model,
+    year.year,
+    
+    products.subcategory_id AS subCategoryId,
+    products.make_id AS makeId,
+    products.model_id AS modelId,
+    products.year_id AS yearId
+
+
+
+
+    FROM products 
+
+    LEFT JOIN make ON  products.make_id = make.make_id
+    LEFT JOIN model ON  products.model_id = model.model_id
+    LEFT JOIN year ON  products.year_id = year.year_id
+    LEFT JOIN subcategories ON  products.subcategory_id = subcategories.subcategory_id
+
 
     WHERE products.product_id =? LIMIT 1`,
     [productId]
@@ -127,6 +190,7 @@ export const dbProuductPagination = async (lastId) => {
     price,
     new_arrival	AS newArrival,
     condition_of_part AS conditionOfPart,
+    status,
     image,
     make.make,
     model.model,

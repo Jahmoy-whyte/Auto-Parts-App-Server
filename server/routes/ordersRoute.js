@@ -26,15 +26,29 @@ const Route = Router();
 
 Route.post("/", userVerifyJwtToken, userIsPermitted(USER_ONLY), insertOrders);
 
-Route.get("/", userVerifyJwtToken, userIsPermitted(USER_ONLY), getUserOrders);
+Route.get(
+  "/",
+  userVerifyJwtToken,
+  userIsPermitted(USERS_AND_GUESTS),
+  getUserOrders
+);
 
 Route.get(
-  "/:id",
+  "/get-order-by-id/:id",
   userVerifyJwtToken,
   userIsPermitted(USER_ONLY),
   getUserOrderDetail
 );
+
 //employee ==============================================================================
+
+Route.get(
+  "/:id",
+  employeeVerifyJwtToken,
+  employeeIsPermitted(ADMIN_AND_EMPLOYEE),
+  getUserOrderDetail
+);
+
 Route.get(
   "/orders/get",
   employeeVerifyJwtToken,

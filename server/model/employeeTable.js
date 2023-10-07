@@ -155,3 +155,12 @@ export const dbGetEmployeeById = async (employeeId) => {
 
   return result;
 };
+
+export const dbDeleteRefreshtoken = async (employeeId) => {
+  const [result] = await pool.execute(
+    `DELETE FROM refresh_token WHERE user_id = ?`,
+    [employeeId]
+  );
+
+  return result;
+};

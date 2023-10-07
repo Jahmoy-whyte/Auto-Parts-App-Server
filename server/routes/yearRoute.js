@@ -12,10 +12,9 @@ import employeeIsPermitted from "../middleware/employee-middle-ware/employeeIsPe
 import verifyJwtEmployeeToken from "../middleware/employee-middle-ware/employeeVerifyJwtToken.js";
 const Route = Router();
 
+Route.get("/:modelId", getYearBasedOnModelId);
 Route.use(verifyJwtEmployeeToken);
 Route.use(employeeIsPermitted(ADMIN_AND_EMPLOYEE));
-
-Route.get("/:modelId", getYearBasedOnModelId);
 
 Route.get("/", getYears);
 

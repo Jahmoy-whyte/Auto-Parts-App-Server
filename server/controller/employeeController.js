@@ -8,6 +8,7 @@ import {
   dbEmployeeUpdate,
   dbGetEmployeeById,
   dbDeleteEmployee,
+  dbDeleteRefreshtoken,
 } from "../model/employeeTable.js";
 import Jwt from "jsonwebtoken";
 import "dotenv/config";
@@ -66,7 +67,7 @@ const login = async (req, res, next) => {
     // sign refresh token
     const refreshToken = Jwt.sign(user, EMPLOYEE_REFRESH_TOKEN_SECRET);
     // save refresh token to table
-    const refreshTokenTokenId = await dbSaveRefreshToken(user.id, refreshToken);
+    await dbSaveRefreshToken(user.id, refreshToken);
 
     // res.cookie("tokens", "tokens");
 
@@ -75,7 +76,7 @@ const login = async (req, res, next) => {
       httpOnly: true,
     });
 
-    res.status(200).json({ res: accessToken });
+    res.status(200).json({ res: { accessToken: accessToken, user: user } });
   } catch (error) {
     next(error);
   }
@@ -117,8 +118,24 @@ const refreshToken = async (req, res, next) => {
         expiresIn: ACCESS_EXPIRES,
       });
 
-      res.status(200).json({ res: newAccessToken, status: "ok" });
+      res.status(200).json({
+        res: { accessToken: newAccessToken, user: user },
+        status: "ok",
+      });
       console.log("employee refresh token");
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getAccount = async (req, res, next) => {
+  try {
+    const id = req.user.id;
+    const data = await dbGetEmployeeById(id);
+    res.status(200).json({
+      res: data[0],
+      status: "ok",
     });
   } catch (error) {
     next(error);
@@ -206,11 +223,26 @@ const deleteEmployee = async (req, res, next) => {
   }
 };
 
+const InvalidateRefreshtoken = async (req, res, next) => {
+  const id = req.params.id;
+  try {
+    await dbDeleteRefreshtoken(id);
+    res.status(200).json({
+      res: "Sign out successful",
+      status: "ok",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export {
+  InvalidateRefreshtoken,
   signUp,
   login,
   logout,
   refreshToken,
+  getAccount,
   countEmployees,
   getAllEmployees,
   employeeSearch,

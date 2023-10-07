@@ -84,12 +84,12 @@ export const dbUpdateGuestToUser = async (userId, email, hashedpassword) => {
   console.log(result);
 };
 
-export const dbLogoutUser = async (userId, refreshTokenTokenId) => {
+export const dbLogoutUser = async (userId, refreshToken) => {
   const [result] = await pool.execute(
     `DELETE FROM refresh_token
-    WHERE user_id =? AND  token_id =?
+    WHERE user_id =? AND  refresh_token =?
     `,
-    [userId, refreshTokenTokenId]
+    [userId, refreshToken]
   );
 };
 
@@ -283,6 +283,15 @@ export const dbGetUserById = async (userId) => {
     LEFT JOIN address ON users.selected_address_id = address.address_id
     WHERE users.user_id = ?
     `,
+    [userId]
+  );
+
+  return result;
+};
+
+export const dbDeleteRefreshtoken = async (userId) => {
+  const [result] = await pool.execute(
+    `DELETE FROM refresh_token WHERE user_id = ?`,
     [userId]
   );
 
