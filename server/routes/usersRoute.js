@@ -27,6 +27,7 @@ import {
   updateSelectedAddress,
   updateUserAccount,
   InvalidateRefreshtoken,
+  ifPushTokenExist,
 } from "../controller/userController.js";
 import employeeIsPermitted from "../middleware/employee-middle-ware/employeeIsPermitted.js";
 import employeeVerifyJwtToken from "../middleware/employee-middle-ware/employeeVerifyJwtToken.js";
@@ -51,6 +52,13 @@ Route.post(
   userVerifyJwtToken,
   userIsPermitted(USERS_AND_GUESTS),
   logout
+);
+
+Route.post(
+  "/if-push-token-exist",
+  userVerifyJwtToken,
+  userIsPermitted(USERS_AND_GUESTS),
+  ifPushTokenExist
 );
 
 /* 

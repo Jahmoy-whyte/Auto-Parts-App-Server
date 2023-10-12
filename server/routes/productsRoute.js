@@ -13,6 +13,7 @@ import {
   updateProduct,
   deleteProduct,
   userGetProductById,
+  getProductByCategory,
 } from "../controller/productController.js";
 import userIsPermitted from "../middleware/user-middle-ware/userIsPermitted.js";
 import employeeVerifyJwtToken from "../middleware/employee-middle-ware/employeeVerifyJwtToken.js";
@@ -24,6 +25,7 @@ import {
   USERS_AND_GUESTS,
   USER_ONLY,
 } from "../helper/permission.js";
+import { dbGetProductByCategory } from "../model/productsTable.js";
 
 const Route = Router();
 
@@ -46,6 +48,13 @@ Route.get(
   userVerifyJwtToken,
   userIsPermitted(USERS_AND_GUESTS),
   getProductsByAttributesAndCategory
+);
+
+Route.get(
+  "/get-product-by-category/:subCategoryId",
+  userVerifyJwtToken,
+  userIsPermitted(USERS_AND_GUESTS),
+  getProductByCategory
 );
 
 Route.get(

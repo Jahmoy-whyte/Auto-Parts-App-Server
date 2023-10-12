@@ -11,11 +11,23 @@ import {
   dbUpdateProduct,
   dbDeleteProduct,
   dbUserGetProductById,
+  dbGetProductByCategory,
 } from "../model/productsTable.js";
 
 const getNewArrival = async (req, res, next) => {
   try {
     const data = await dbGetNewArrival();
+    res.status(200).json({ res: data, status: "ok" });
+    console.log("product");
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getProductByCategory = async (req, res, next) => {
+  try {
+    const subCategoryId = req.params.subCategoryId;
+    const data = await dbGetProductByCategory(subCategoryId);
     res.status(200).json({ res: data, status: "ok" });
     console.log("product");
   } catch (error) {
@@ -156,6 +168,7 @@ export {
   updateProduct,
   deleteProduct,
   userGetProductById,
+  getProductByCategory,
 };
 
 /*

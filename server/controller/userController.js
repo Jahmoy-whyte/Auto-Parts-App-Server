@@ -15,6 +15,8 @@ import {
   dbGetUserById,
   dbUserUpdate,
   dbDeleteRefreshtoken,
+  dbSavePushToken,
+  dbIfPushTokenExist,
 } from "../model/usersTable.js";
 
 import { randomUUID } from "crypto";
@@ -314,6 +316,26 @@ const InvalidateRefreshtoken = async (req, res, next) => {
   }
 };
 
+const ifPushTokenExist = async (req, res, next) => {
+  const userId = req.user.id;
+  const expoPushToken = req.body.expoPushToken;
+
+  try {
+    const bool = await dbIfPushTokenExist(userId, expoPushToken);
+    console.log(bool);
+    if (!bool) {
+      await dbSavePushToken(userId, expoPushToken);
+    }
+
+    res.status(200).json({
+      res: "successful",
+      status: "ok",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export {
   InvalidateRefreshtoken,
   signup,
@@ -331,4 +353,5 @@ export {
   updateUserAccount,
   getUserById,
   deleteUser,
+  ifPushTokenExist,
 };

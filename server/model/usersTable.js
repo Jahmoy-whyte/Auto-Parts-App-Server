@@ -48,6 +48,7 @@ export const dbLoggedInUserInfo = async (userId) => {
     firstname AS firstName,
     lastname AS lastName,
     phone,
+    expo_push_token AS expoPushToken,
     address.address,
     address.place_type AS placeType,
     address_id AS addressId
@@ -296,4 +297,23 @@ export const dbDeleteRefreshtoken = async (userId) => {
   );
 
   return result;
+};
+
+export const dbSavePushToken = async (userId, expoPushToken) => {
+  const [result] = await pool.execute(
+    `INSERT INTO notification_tokens  (user_id, token) VALUES (?,?)
+    `,
+    [userId, expoPushToken]
+  );
+};
+
+export const dbIfPushTokenExist = async (userId, expoPushToken) => {
+  const [result] = await pool.execute(
+    `SELECT * FROM notification_tokens  
+    WHERE user_id =? AND token =?
+    `,
+    [userId, expoPushToken]
+  );
+
+  return result.length > 0;
 };
