@@ -44,7 +44,7 @@ const dbGetSales = async () => {
     `
     SELECT shortend_months_name AS shortendMonthsName  , monthlySales.month ,
     
-    CASE WHEN monthlySales.total IS NULL THEN 0  ELSE  monthlySales.total  END AS total
+    CASE WHEN monthlySales.total IS NULL THEN CAST(0 AS SIGNED)   ELSE  CAST(monthlySales.total AS SIGNED)  END AS total
 
     FROM months 
 
@@ -55,7 +55,7 @@ const dbGetSales = async () => {
       SUM(total) AS total
       FROM orders 
       WHERE YEAR(date) = YEAR(CURRENT_DATE)
-      GROUP BY MONTH(date)	
+      GROUP BY month	
      
       ) AS monthlySales
 
@@ -85,12 +85,12 @@ const dbGetGuestToUserRatio = async () => {
   const [result] = await pool.execute(
     `
     SELECT
-    MONTHNAME(date) AS month,
+ 
     COUNT(CASE WHEN user_status = 'user' THEN 1 END) AS userCount,
     COUNT(CASE WHEN user_status = 'guest' THEN 1 END) AS guestCount
     FROM users
 
-    ;
+    
     `
   );
 
@@ -126,7 +126,7 @@ const dbGetNewUserThisMonth = async () => {
       SELECT 
       COUNT(user_id) AS count
       FROM users
-      WHERE DATE(date) = CURRENT_DATE()
+      WHERE MONTH(date) = MONTH(CURRENT_DATE())
       `
   );
   return result[0].count;

@@ -48,7 +48,7 @@ export const dbLoggedInUserInfo = async (userId) => {
     firstname AS firstName,
     lastname AS lastName,
     phone,
-    expo_push_token AS expoPushToken,
+
     address.address,
     address.place_type AS placeType,
     address_id AS addressId
@@ -140,9 +140,8 @@ export const dbGetAllUsers = async (start, end) => {
   FROM users 
 
   LEFT JOIN address ON users.selected_address_id = address.address_id
-  LIMIT ? OFFSET ?
-  `,
-    [end, start]
+  LIMIT ${end} OFFSET ${start}
+  `
   );
   return result;
 };

@@ -154,10 +154,10 @@ export const dbGetOrdersOnCondition = async (status, start, limit) => {
 
     WHERE orders.status = ? 
     ORDER BY orders.date 
-    LIMIT ?  OFFSET ?
+    LIMIT ${limit}  OFFSET ${start}
   
     `,
-    [status, limit, start]
+    [status]
   );
 
   return result;

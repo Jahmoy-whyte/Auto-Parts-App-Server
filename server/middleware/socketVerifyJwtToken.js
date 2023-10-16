@@ -1,23 +1,27 @@
 import Jwt from "jsonwebtoken";
 import CustomError from "../helper/CustomError.js";
 import "dotenv/config";
+import { ADMIN_AND_EMPLOYEE, USERS_AND_GUESTS } from "../helper/permission.js";
 
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
+const EMPLOYEE_ACCESS_TOKEN_SECRET = process.env.EMPLOYEE_ACCESS_TOKEN_SECRET;
 
 const socketVerifyJwtToken = async (socket, next) => {
   try {
-    const authHeader = socket.handshake.auth?.token;
-    console.log(authHeader);
-    if (!authHeader) throw new CustomError(401, "unauthorized(V101)");
+    const authToken = socket.handshake.auth?.token;
+    const authRole = socket.handshake.auth?.role;
 
-    const token = authHeader;
+    if (!authRole) throw new CustomError(401, "no role");
+    if (!authToken) throw new CustomError(401, "no token");
 
-    if (!token) throw new CustomError(401, "unauthorized(V201)");
+    const SECRET = USERS_AND_GUESTS.includes(authRole)
+      ? ACCESS_TOKEN_SECRET
+      : EMPLOYEE_ACCESS_TOKEN_SECRET;
 
-    Jwt.verify(token, ACCESS_TOKEN_SECRET, (err, user) => {
+    Jwt.verify(authToken, SECRET, (err, user) => {
       if (err && err.message == "jwt expired")
         throw new CustomError(401, "jwt expired");
-      if (err) throw new CustomError(401, "unauthorized(V301)");
+      if (err) throw new CustomError(401, "unauthorized");
       socket.user = user;
       return next();
     });

@@ -19,32 +19,37 @@ import employeeRoute from "./server/routes/employeeRoute.js";
 import cookieParser from "cookie-parser";
 import dashBoardRoute from "./server/routes/dashBoardRoute.js";
 import favoritesRoute from "./server/routes/favoritesRoute.js";
+import notificationRoute from "./server/routes/notificationRoute.js";
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   /* options */
   cors: {
     credentials: true,
-    origin: "http://localhost:5173",
+    origin: [
+      "http://localhost:5173",
+      "https://auto-parts-dashboard.onrender.com",
+    ],
   },
 });
 
-//io.use(socketVerifyJwtToken);
-//io.use(socketIsPermitted(USER_ONLY));
+io.use(socketVerifyJwtToken);
 
 io.on("connection", (socket) => {
   console.log(socket.id);
 
-  socket.on("OrderSent", (msg) => {
-    // console.log(socket.handshake.auth.token);
-    console.log(msg);
-    socket.broadcast.emit("OrderSent-res", msg);
+  socket.on("OrderSent", (userId) => {
+    socket.broadcast.emit("OrderUpdate", { userId: userId });
+    socket.broadcast.emit("OrderSent", "newOrder");
   });
 
-  socket.on("OrderUpdate", (arg) => {
-    // console.log(socket.handshake.auth.token);
-    console.log(arg);
-    socket.broadcast.emit("OrderUpdate-res", arg);
+  socket.on("refresh", () => {
+    socket.broadcast.emit("refresh", "all");
+  });
+
+  socket.on("OrderUpdate", (userObj) => {
+    //userObj contains userId
+    socket.broadcast.emit("OrderUpdate", userObj);
   });
 });
 
@@ -73,6 +78,7 @@ app.use("/categories", categoriesRoute);
 app.use("/cart", cartRoute);
 app.use("/address", addressRoute);
 app.use("/favorites", favoritesRoute);
+app.use("/notifications", notificationRoute);
 
 app.get("/", (req, res) => {
   res.send("server is up");

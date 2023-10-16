@@ -63,9 +63,8 @@ export const dbGetAllEmployees = async (start, end) => {
   
   FROM employee 
 
-  LIMIT ? OFFSET ?
-  `,
-    [end, start]
+  LIMIT ${end}  OFFSET ${start} 
+  `
   );
   return result;
 };

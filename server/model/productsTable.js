@@ -282,7 +282,7 @@ export const dbGetProducts = async (start, limit) => {
 
     LEFT JOIN subcategories ON  products.subcategory_id = subcategories.subcategory_id
 
-    LIMIT ?,?`,
+    LIMIT ${start}, ${limit}`,
     [start, limit]
   );
   return result;
