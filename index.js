@@ -57,7 +57,11 @@ const port = process.env.PORT || 3000;
 
 const corsConfig = {
   credentials: true,
-  origin: ["http://localhost:5173", "https://tqpq2cws-5173.use2.devtunnels.ms"],
+  origin: [
+    "http://localhost:5173",
+    "https://tqpq2cws-5173.use2.devtunnels.ms",
+    "https://auto-parts-dashboard.onrender.com",
+  ],
 };
 app.use(cors(corsConfig));
 app.use(express.json());
