@@ -147,8 +147,8 @@ export const dbUserGetProductById = async (productId, userId) => {
     products.model_id AS modelId,
     products.year_id AS yearId,
 
-    COUNT(favorite_id) AS favoriteBool,
-    favorite_id  AS favoriteId
+
+    favorite_id  AS favoriteBool
 
 
 

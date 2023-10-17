@@ -32,8 +32,7 @@ export const dbCreateEmployeeAccount = async (
 
 export const dbLogoutEmployee = async (userId, refreshToken) => {
   const [result] = await pool.execute(
-    `DELETE FROM refresh_token WHERE user_id =? AND refresh_token=? `,
-    [userId, refreshToken]
+    `DELETE FROM refresh_token WHERE user_id ='${userId}' AND refresh_token='${refreshToken}' `
   );
 };
 
